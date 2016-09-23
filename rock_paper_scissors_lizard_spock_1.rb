@@ -1,4 +1,6 @@
 VALID_CHOICES = %w(rock paper scissors lizard spock)
+player_wins = 0
+computer_wins = 0
 
 def prompt(message)
   puts "=> #{message}"
@@ -45,9 +47,23 @@ loop do
   puts "You chose: #{choice}; computer chose: #{computer_choice}"
 
   display_results(choice, computer_choice)
+  
+  if win?(choice, computer_choice)
+    player_wins += 1
+  elsif win?(computer_choice, choice)
+    computer_wins += 1
+  end
 
-  prompt("Do you want to play again?")
-  answer = gets.chomp
+  if player_wins == 5
+    prompt("You won all 5 games! Do you want to play again?")
+    answer = gets.chomp
 
-  break unless answer.downcase.start_with?('y')
+    break unless answer.downcase.start_with?('y')
+  elsif computer_wins == 5
+    prompt("Computer won all 5 games! Do you want to play again?")
+    answer = gets.chomp
+
+    break unless answer.downcase.start_with?('y')
+  end
+
 end
