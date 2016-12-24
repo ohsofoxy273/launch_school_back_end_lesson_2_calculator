@@ -9,8 +9,4 @@ class TestGame < MiniTest::Test
     user_selection = battle.get_player_name
     assert_equal "Joe", user_selection
   end
-
-  
-
-
 end
