@@ -77,12 +77,12 @@ class Board
      squares.select { |square| square.position == position }.first
   end
 
-  def columns
-    squares.each { |square| square.position[1] }
+  def columns 
+    squares.map { |square| square.position[1] }
   end
 
   def rows
-    squares.each { |square| square.position[0] }
+    squares.map { |square| square.position[0] }
   end
 
 
@@ -328,9 +328,28 @@ class Game
   end
 end
 
-battle = Game.new
-battle.play
+# battle = Game.new
+# battle.play
+b = Board.new
+p b.rows
+p b.columns
 
+# place a ship:
+
+# horizontal or vertical 
+# pick a random square
+# pick another if not available
+# if the next rows / columns are available to the length the ship
+  # place the ship
+# else 
+  # start again
+
+# next row and column:
+
+# square is chosen i.e 11
+# add 1 per length if horizontal row i.e. 12, 13
+# if a vertical column, the column (2nd num) changes
+# find the square see if taken
 
 
 
