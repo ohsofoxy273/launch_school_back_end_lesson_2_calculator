@@ -16,9 +16,10 @@ end
 
 class Board
 
-  attr_reader :squares 
+  attr_reader :squares, :size
 
   def initialize
+    @size = 5
     @squares = []
     positions = BoardPositions.positions
     reset(positions)
@@ -44,7 +45,7 @@ class Board
   end
 
   def reset(positions)
-    0.upto(24) { |index| squares[index] = Square.new(positions[index]) }
+    0.upto(24) { |index| squares[index] = Square.new(positions[index][0], positions[index][1]) }
   end
 
   def square_available?(chosen_square)
@@ -61,30 +62,9 @@ class Board
     squares.select {|square| square.position == chosen_position }.first.marker = Square::MISS_MARKER
   end
 
-  def one_available_squares
-    squares.select do |square|
-      !square.ship_placed
-    end
-  end
-
-  def two_available_squares
-    #TODO
-    
-    squares.select { |square| !square.ship_placed }
-  end
-
   def location(position)
      squares.select { |square| square.position == position }.first
   end
-
-  def columns 
-    squares.map { |square| square.position[1] }
-  end
-
-  def rows
-    squares.map { |square| square.position[0] }
-  end
-
 
 end
 
@@ -94,10 +74,11 @@ class Square
   MISS_MARKER = '/'
 
   attr_accessor :marker, :ship_placed
-  attr_reader :position
+  attr_reader :row, :column
 
-  def initialize(position, marker=INITIAL_MARKER)
-    @position = position
+  def initialize(row, column, marker=INITIAL_MARKER)
+    @row = row
+    @column = column
     @marker = marker
     @ship_placed = false
   end
@@ -109,14 +90,20 @@ class Square
   def unmarked?
     marker == INITIAL_MARKER
   end
+
+  def position
+    [row, column]
+  end
 end
 
 class Ship
   attr_accessor :ship_positions
+  attr_reader :length
 
   def initialize
     @hits = 0
     @alive = true
+    @ship_positions = []
   end
 
   def status
@@ -141,10 +128,6 @@ class Ship
     @alive = false
   end
 
-  def set_position(board)
-    @ship_positions = []
-  end
-
 end
 
 class Destroyer < Ship
@@ -159,9 +142,38 @@ class Destroyer < Ship
   end
 
   def set_position(board)
+    place_ship(board)
     position = board.one_available_squares.sample.position
     board.location(position).ship_placed = true
-    super << position
+    ship_positions << position
+  end
+
+  def place_ship(board)
+    binding.pry
+    num = rand(1..2)
+    num == 1 ? 
+    max_placement = board.size + 1 - length
+    loop do
+
+      # if horizontal
+        # choose number 1..max, this is the column
+        # choose number 1..5, this is the row
+        # get the square from the numbers
+        # add ship length to get next square(s)
+        
+
+      # if vertical
+        # choose number 1..max, this is the row
+        # choose number 1..5, the is the column
+        # get the square from the numbers
+        # add ship length to get next square(s)
+
+      # break if all squares ship_placed == false
+
+
+    end
+    # place ship_placed = true for all squares
+    # add ship positions << position
   end
 
 end
@@ -177,9 +189,13 @@ class Cruiser < Ship
   end
 
   def set_position(board)
-    board.two_available_squares
+    board.two_available_squares #todo
     position = [3,1], [3,2]
-    super << position
+    
+    position.each { |sq|
+      board.location(sq).ship_placed = true
+      ship_positions << sq
+    }
   end
 
 end
@@ -196,7 +212,11 @@ class Battleship < Ship
 
   def set_position(board)
 
-    @ship_positions = [[4,2], [4,3], [4,4]] #TODO
+    position = [[4,2], [4,3], [4,4]] #TODO
+    position.each do |sq|
+      board.location(sq).ship_placed = true
+      ship_positions << sq
+    end
   end
 
 end
@@ -207,7 +227,7 @@ class Player
   def initialize(name)
     @name = name.capitalize
     @board = Board.new
-    @ships = [Destroyer.new, Cruiser.new, Battleship.new]
+    @ships = [ Cruiser.new, Battleship.new, Destroyer.new ]
     set_ship_positions(board)
   end
 
@@ -325,14 +345,15 @@ class Game
     puts "#{computer.name}'s Board:"
     computer.board.draw
     computer.ships.each {|ship| ship.status}
+    
   end
 end
 
-# battle = Game.new
-# battle.play
-b = Board.new
-p b.rows
-p b.columns
+battle = Game.new
+battle.play
+# b = Board.new
+# p b.rows
+# p b.columns
 
 # place a ship:
 
